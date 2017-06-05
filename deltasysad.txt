@@ -1,0 +1,98 @@
+#!/bin/bash
+
+#CREATING USERS
+
+var=0
+while [ $var -le 9 ]
+do
+   sudo adduser user$var
+   ((var++))
+done
+
+#CREATING A FOLDER NAMED DELTA INSIDE WHICH 10 FOLDERS WITH A .TXT FILE HAVING 10 RANDOM ALPHANUMERIC CHARACTERS IS PRESENT 
+for i in {0..9}
+do
+   sudo su - user$i
+   mkdir delta
+   cd delta
+   for j in {1..10}
+   do
+      mkdir folder$j
+      cd folder$j
+      head /dev/urandom | tr -dc A-Za-z0-9 | head -c10 > random.txt
+      cd ..
+   done
+   cd ..
+done
+
+#CREATING THE NECESSARY GROUPS
+
+sudo addgroup root
+sudo addgroup admins
+sudo addgroup moderators
+sudo addgroup students
+
+
+#adding user0 to root group
+
+sudo adduser user0 root
+
+#adding user 1,2,3 to admins group
+
+for x in {1..3}
+do
+   sudo adduser user$x admins 
+done
+
+#ADDING USER 4,5,6 TO MODERATORS GROUP
+
+for y in {4..6}
+do
+   sudo adduser user$y moderators
+done
+
+#ADDING USER 7,8,9 TO STUDENTS GROUP
+
+for z in {7..9}
+do
+   sudo adduser user$z students
+done
+
+#CREATING NECESSARY GROUP
+
+sudo addgroup RAM
+sudo addgroup RA
+
+#ADD USERS BELONGING TO ROOT,ADMINS,MODERATORS TO RAM GROUP AND SET THE GROUP PERMISSIONS FOR USER 7,8,9
+
+for a in {0..6}
+do
+   sudo usermod -aG RAM user$a
+done
+
+#CHANGE THE GROUP OWNER OF USER 7,8,9 TO RAM
+for b in {7..9}
+do
+   sudo chgrp RAM /home/user$b
+   sudo chmod -R 770 /home/user$b
+done
+
+#ADD USERS BELONGING TO ROOT,ADMINS TO RA GROUP AND SET THE GROUP PERMISSIONS FOR USER 4,5,6
+for c in {0..3}
+do
+   sudo usermod -aG RA user$c
+done
+
+#CHANGE THE GROUP OWNER OF USER 4,5,6 TO RA
+for d in {4..6}
+do
+   sudo chgrp RA /home/user$d
+   sudo chmod -R 770 /home/user$d
+done
+
+#CHANGE THE GROUP OWNER OF USER 1,2,3 TO ROOT AND SET THE PERMISSIONS
+for e in {1..3}
+do
+   sudo chgrp root/home/user$e
+   sudo chmod -R 770 /home/user$e
+done
